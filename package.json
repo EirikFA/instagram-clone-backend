@@ -1,0 +1,57 @@
+{
+  "name": "instagram-clone",
+  "version": "0.0.0",
+  "description": "Instagram clone backend built using TypeGraphQL with Apollo and Prisma",
+  "main": "src/index.ts",
+  "scripts": {
+    "start": "tsnd --respawn -r tsconfig-paths/register src/index.ts",
+    "debug": "tsnd --respawn -r tsconfig-paths/register --inspect -- src/index.ts",
+    "test": "maybe later"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/EirikFA/instagram-clone.git"
+  },
+  "author": "Eirik Fossestøl Andresen <eirik@arweb.no>",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/EirikFA/instagram-clone/issues"
+  },
+  "homepage": "https://api.instagram-clone.arweb.no",
+  "prisma": {
+    "schema": "src/prisma/schema.prisma"
+  },
+  "dependencies": {
+    "@prisma/client": "^2.17.0",
+    "apollo-server-express": "^2.21.0",
+    "bcrypt": "^5.0.0",
+    "class-validator": "^0.13.1",
+    "cookie-parser": "^1.4.5",
+    "express": "^4.17.1",
+    "graphql": "^15.5.0",
+    "graphql-fields": "^2.0.3",
+    "graphql-scalars": "^1.7.1",
+    "jsonwebtoken": "^8.5.1",
+    "reflect-metadata": "^0.1.13",
+    "type-graphql": "^1.1.1",
+    "typedi": "^0.10.0"
+  },
+  "devDependencies": {
+    "@types/bcrypt": "^3.0.0",
+    "@types/cookie-parser": "^1.4.2",
+    "@types/graphql-fields": "^1.3.3",
+    "@types/jsonwebtoken": "^8.5.0",
+    "@types/node": "^14.14.31",
+    "@typescript-eslint/eslint-plugin": "^4.15.2",
+    "@typescript-eslint/parser": "^4.15.2",
+    "eslint": "^7.20.0",
+    "eslint-config-airbnb-typescript": "^12.3.1",
+    "eslint-import-resolver-typescript": "^2.4.0",
+    "eslint-plugin-import": "^2.22.1",
+    "prisma": "^2.17.0",
+    "ts-node-dev": "^1.1.1",
+    "tsconfig-paths": "^3.9.0",
+    "typegraphql-prisma": "^0.11.1",
+    "typescript": "^4.2.2"
+  }
+}

@@ -1,0 +1,118 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+datasource db {
+  provider          = "postgresql"
+  url               = env("DATABASE_URL")
+  shadowDatabaseUrl = env("SHADOW_DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+generator typegraphql {
+  provider = "typegraphql-prisma"
+  output   = "../generated/typegraphql-prisma"
+}
+
+enum Gender {
+  MALE
+  FEMALE
+  NONBINARY
+}
+
+model User {
+  id           Int           @id @default(autoincrement())
+  /// @TypeGraphQL.omit(output: true)
+  authUuid     String        @unique @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  username     String        @unique
+  /// @TypeGraphQL.omit(output: true)
+  hash         String
+  email        String        @unique
+  phone        String?       @unique
+  gender       Gender?
+  profile      Profile?
+  posts        Post[]
+  followers    Follow[]      @relation("Follower")
+  following    Follow[]      @relation("Following")
+  postLikes    PostLike[]
+  comments     Comment[]
+  commentLikes CommentLike[]
+  storyPosts   StoryPost[]
+}
+
+model Profile {
+  userId  Int     @id
+  user    User    @relation(fields: [userId], references: [id])
+  name    String?
+  website String?
+  bio     String?
+}
+
+model Follow {
+  targetId   Int
+  target     User     @relation("Follower", fields: [targetId], references: [id])
+  followerId Int
+  follower   User     @relation("Following", fields: [followerId], references: [id])
+  createDate DateTime @default(now())
+
+  @@id([targetId, followerId])
+}
+
+model Post {
+  id          Int           @id @default(autoincrement())
+  text        String
+  publishDate DateTime      @default(now())
+  authorId    Int
+  author      User          @relation(fields: [authorId], references: [id])
+  pictures    PostPicture[]
+  likes       PostLike[]
+  comments    Comment[]
+}
+
+model PostPicture {
+  id     String @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  url    String
+  postId Int
+  post   Post   @relation(fields: [postId], references: [id])
+}
+
+model PostLike {
+  postId Int
+  post   Post @relation(fields: [postId], references: [id])
+  userId Int
+  user   User @relation(fields: [userId], references: [id])
+
+  @@id([postId, userId])
+}
+
+model Comment {
+  id       Int           @id @default(autoincrement())
+  content  String
+  postId   Int
+  post     Post          @relation(fields: [postId], references: [id])
+  authorId Int
+  author   User          @relation(fields: [authorId], references: [id])
+  parentId Int?
+  parent   Comment?      @relation("CommentChildren", fields: [parentId], references: [id])
+  children Comment[]     @relation("CommentChildren")
+  likes    CommentLike[]
+}
+
+model CommentLike {
+  commentId Int
+  comment   Comment @relation(fields: [commentId], references: [id])
+  userId    Int
+  user      User    @relation(fields: [userId], references: [id])
+
+  @@id([commentId, userId])
+}
+
+model StoryPost {
+  id          Int      @id @default(autoincrement())
+  pictureUrl  String
+  publishDate DateTime @default(now())
+  authorId    Int
+  author      User     @relation(fields: [authorId], references: [id])
+}

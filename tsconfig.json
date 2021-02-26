@@ -1,0 +1,66 @@
+{
+  "compilerOptions": {
+    "outDir": "dist",
+    "target": "ES2018",
+    "lib": [
+      "ESNext"
+    ],
+    "moduleResolution": "Node",
+    "sourceMap": true,
+    "strict": true,
+    "esModuleInterop": true,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "baseUrl": "./src",
+    "paths": {
+      "@constant": [
+        "constant"
+      ],
+      "@constant/*": [
+        "constant/*"
+      ],
+      "@generated": [
+        "generated"
+      ],
+      "@generated/*": [
+        "generated/*"
+      ],
+      "@middleware": [
+        "middleware"
+      ],
+      "@middleware/*": [
+        "middleware/*"
+      ],
+      "@module": [
+        "module"
+      ],
+      "@module/*": [
+        "module/*"
+      ],
+      "@server": [
+        "server"
+      ],
+      "@server/*": [
+        "server/*"
+      ],
+      "@types": [
+        "types"
+      ],
+      "@types/*": [
+        "types/*"
+      ],
+      "@util": [
+        "util"
+      ],
+      "@util/*": [
+        "util/*"
+      ],
+      "@validation": [
+        "validation"
+      ],
+      "@validation/*": [
+        "validation/*"
+      ]
+    }
+  }
+}

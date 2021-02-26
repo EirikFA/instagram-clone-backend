@@ -1,0 +1,8 @@
+# Build files
+node_modules/
+dist/
+generated/
+
+# Environment
+.env
+.vscode/
