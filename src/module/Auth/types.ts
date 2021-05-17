@@ -2,13 +2,13 @@ import { IsUniqueUser } from "@validation";
 import { Matches } from "class-validator";
 import { GraphQLEmailAddress } from "graphql-scalars";
 import {
-  ArgsType, createUnionType, Field, InputType, ObjectType
+  ArgsType, Field, InputType, ObjectType
 } from "type-graphql";
 
 @InputType()
 export class RegisterInput {
   @Field(_type => GraphQLEmailAddress)
-  @IsUniqueUser("email")
+  @IsUniqueUser("email", false)
   email!: string;
 
   @Field()
@@ -18,7 +18,7 @@ export class RegisterInput {
   password!: string;
 
   @Field()
-  @IsUniqueUser("username")
+  @IsUniqueUser("username", false)
   username!: string;
 }
 
@@ -32,24 +32,7 @@ export class LoginArgs {
 }
 
 @ObjectType()
-export class SuccessLogin {
+export class LoginResult {
   @Field()
   token!: string;
 }
-
-@ObjectType()
-export class FailedLogin {
-  @Field()
-  error!: string;
-}
-
-export const LoginResult = createUnionType({
-  name: "LoginResult",
-  types: () => [SuccessLogin, FailedLogin] as const,
-  resolveType: value => {
-    if ("error" in value) return FailedLogin;
-    if ("token" in value) return SuccessLogin;
-
-    return undefined;
-  }
-});

@@ -1,5 +1,7 @@
 import { Context } from "@types";
-import { toApolloError, UserInputError } from "apollo-server-express";
+import {
+  AuthenticationError, ForbiddenError, toApolloError, UserInputError, ValidationError
+} from "apollo-server-express";
 import { MiddlewareFn } from "type-graphql";
 
 const ErrorMiddleware: MiddlewareFn<Context> = async (_, next) => {
@@ -17,7 +19,12 @@ const ErrorMiddleware: MiddlewareFn<Context> = async (_, next) => {
       console.error(newErr);
     } else if (e.message === "Argument Validation Error") {
       newErr = toApolloError(newErr, "BAD_USER_INPUT");
-    } else if (!(e instanceof UserInputError)) console.error(newErr);
+    } else if (
+      !(e instanceof UserInputError)
+      && !(e instanceof ValidationError)
+      && !(e instanceof AuthenticationError)
+      && !(e instanceof ForbiddenError)
+    ) console.error(newErr);
 
     throw newErr;
   }

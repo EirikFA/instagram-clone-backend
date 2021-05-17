@@ -6,7 +6,7 @@ import { Container } from "typedi";
 
 const setContext = (
   prisma: PrismaClient
-): ApolloServerExpressConfig["context"] => async ({ req }): Promise<Context> => {
+): ApolloServerExpressConfig["context"] => async ({ req, res }): Promise<Context> => {
   // Generate request ID for scoped containers
   const requestId = Math.floor(Math.random() * Number.MAX_SAFE_INTEGER).toString();
   const container = Container.of(requestId);
@@ -25,6 +25,7 @@ const setContext = (
   }
 
   container.set("user", user);
+  container.set("response", res);
 
   const context: Context = {
     prisma,

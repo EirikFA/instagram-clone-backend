@@ -55,9 +55,9 @@ export default class AuthService {
 
     return this.prisma.user.create({
       data: {
-        email,
+        email: email.toLowerCase(),
         hash,
-        username,
+        username: username.toLowerCase(),
         profile: {
           create: {}
         }
@@ -69,6 +69,16 @@ export default class AuthService {
     const { JWT_SECRET } = process.env;
     if (!JWT_SECRET) throw new Error("Missing secret");
 
-    return await promisify(sign)({ uuid }, JWT_SECRET) as string;
+    // Don't even..
+    type SignParamsRequired = Parameters<typeof sign>;
+    type SignParams = [
+      payload: SignParamsRequired[0],
+      secretOrPrivateKey: SignParamsRequired[1],
+      options?: SignParamsRequired[2],
+      callback?: SignParamsRequired[3]
+    ];
+    const signAsync = promisify(sign) as (...params: SignParams) => any;
+
+    return signAsync({ uuid }, JWT_SECRET, { expiresIn: "7d" });
   }
 }

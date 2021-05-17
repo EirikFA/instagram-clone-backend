@@ -16,11 +16,12 @@ export class IsUniqueUserConstraint<
   }
 
   async validate (value: User[K], args: ValidationArguments) {
-    const [targetProperty] = args.constraints as [K];
+    const [targetProperty, caseSensitive] = args.constraints as [K, boolean];
+    const compare = caseSensitive || typeof value !== "string" ? value : value.toLowerCase();
 
     const item = await this.prisma.user.findUnique({
       where: {
-        [targetProperty]: value
+        [targetProperty]: compare
       }
     });
 
@@ -32,11 +33,12 @@ export class IsUniqueUserConstraint<
 // Not typed with `PropertyDecorator` because it has weird issues (try it!)
 const IsUniqueUser = <K extends keyof User>(
   targetProperty: K,
+  caseSensitive: boolean = true,
   options?: ValidationOptions) => (object: Object, propertyName: string) => registerDecorator({
     name: "isUnique",
     target: object.constructor,
     propertyName,
-    constraints: [targetProperty],
+    constraints: [targetProperty, caseSensitive],
     options,
     validator: IsUniqueUserConstraint
   });

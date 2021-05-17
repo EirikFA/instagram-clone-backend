@@ -9,11 +9,18 @@ const createServer = (schema: GraphQLSchema, prisma: PrismaClient) => new Apollo
   context: setContext(prisma),
   plugins: [disposeContainer],
   formatError: e => {
-    if (e.extensions?.code === "INTERNAL_SERVER_ERROR" && process.env.NODE_ENV !== "development") {
-      delete e.extensions.exception;
+    const newError = e;
+
+    if (newError.extensions?.code === "INTERNAL_SERVER_ERROR"
+    && process.env.NODE_ENV !== "development") {
+      delete newError.extensions.exception;
     }
 
-    return e;
+    if (e.message.includes("Access denied") && newError.extensions) {
+      newError.extensions.code = "UNAUTHENTICATED";
+    }
+
+    return newError;
   },
   playground: true
 });
