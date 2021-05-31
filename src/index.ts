@@ -1,5 +1,6 @@
 import "reflect-metadata";
 
+import { PORT } from "@constant";
 import { UserRelationsResolver } from "@generated/typegraphql-prisma";
 import { ErrorMiddleware } from "@middleware";
 import { resolvers } from "@module";
@@ -62,7 +63,7 @@ const bootstrap = async () => {
   });
 
   const {
-    HTTPS, SSL_CRT_FILE, SSL_KEY_FILE, PORT
+    HTTPS, SSL_CRT_FILE, SSL_KEY_FILE
   } = process.env;
 
   let httpsServer: Server | undefined;
@@ -80,9 +81,7 @@ const bootstrap = async () => {
 
   const listenFn = httpsServer ? httpsServer.listen.bind(httpsServer) : app.listen.bind(app);
 
-  const port = PORT ? parseInt(PORT, 10) : 4000;
-
-  const listener = listenFn(port, "0.0.0.0", () => {
+  const listener = listenFn(PORT, "0.0.0.0", () => {
     const address = listener.address();
     let host: string = "unknown";
     if (address && typeof address !== "string") {
@@ -90,7 +89,7 @@ const bootstrap = async () => {
     }
 
     console.log(
-      `Server is running, GraphQL Playground available at ${host}:${port}${server.graphqlPath}`
+      `Server is running, GraphQL Playground available at ${host}:${PORT}${server.graphqlPath}`
     );
   });
 };

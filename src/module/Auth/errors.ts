@@ -1,8 +1,3 @@
-/* eslint-disable import/prefer-default-export */
-export class AlreadyAuthenticatedError extends Error {
-  constructor (...params: Parameters<ErrorConstructor>) {
-    super(...params);
+export class AlreadyAuthenticatedError extends Error {}
 
-    Object.setPrototypeOf(this, AlreadyAuthenticatedError.prototype);
-  }
-}
+export class InvalidTokenError extends Error {}

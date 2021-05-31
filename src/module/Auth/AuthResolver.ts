@@ -1,7 +1,6 @@
 import { User as GraphQLUser } from "@generated/typegraphql-prisma";
-import { User } from "@prisma/client";
-import { ApolloError } from "apollo-server-errors";
-import { AuthenticationError } from "apollo-server-express";
+import { PrismaClient, User } from "@prisma/client";
+import { ApolloError, AuthenticationError, ForbiddenError } from "apollo-server-errors";
 import { NotAuthenticated } from "decorators";
 import { Response } from "express";
 import {
@@ -10,13 +9,17 @@ import {
 import { Inject, Service } from "typedi";
 
 import AuthService from "./AuthService";
-import { LoginArgs, LoginResult, RegisterInput } from "./types";
+import { InvalidTokenError } from "./errors";
+import {
+  LoginArgs, LoginResult, RegisterInput, RequestPasswordResetArgs, ResetPasswordArgs
+} from "./types";
 
 @Service()
 @Resolver()
 export default class AuthResolver {
   constructor (
     private readonly auth: AuthService,
+    private readonly prisma: PrismaClient,
     @Inject("user") private readonly user: User,
     @Inject("response") private readonly response: Response
   ) {}
@@ -27,7 +30,7 @@ export default class AuthResolver {
     let token: string | undefined;
 
     try {
-      token = await this.auth.login(identifier, password);
+      token = await this.auth.logIn(identifier, password);
     } catch (e) {
       console.error("Login error occurred", e);
       throw new ApolloError("Error occurred");
@@ -62,11 +65,43 @@ export default class AuthResolver {
   @Mutation(_type => GraphQLUser)
   @NotAuthenticated()
   async register (@Arg("data") data: RegisterInput): Promise<GraphQLUser> {
+    // TODO: Do not disclose whether email is in use?
     try {
       return await this.auth.register(data);
     } catch (e) {
       console.error("Register error occurred", e);
       throw new ApolloError("Error occurred");
     }
+  }
+
+  @Mutation(_type => Boolean)
+  async requestPasswordReset (@Args() { email }: RequestPasswordResetArgs): Promise<boolean> {
+    const user = await this.prisma.user.findUnique({ where: { email } });
+    if (user) {
+      try {
+        await this.auth.requestPasswordReset(user);
+      } catch (e) {
+        console.error(e);
+        throw new ApolloError("Failed to request password reset");
+      }
+    }
+
+    return true;
+  }
+
+  @Mutation(_type => Boolean)
+  async resetPassword (@Args() { token, password }: ResetPasswordArgs): Promise<boolean> {
+    try {
+      await this.auth.resetPassword(token, password);
+    } catch (e) {
+      if (e instanceof InvalidTokenError) {
+        throw new ForbiddenError("Invalid token");
+      }
+
+      console.error(e);
+      throw new ApolloError("Error occurred while attempting password reset");
+    }
+
+    return true;
   }
 }

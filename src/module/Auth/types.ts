@@ -5,6 +5,11 @@ import {
   ArgsType, Field, InputType, ObjectType
 } from "type-graphql";
 
+export const IsPassword = (
+  pattern: RegExp = /^(?=.*[A-Za-z])(?=.*\d)[\d\w\W]{8,}$/,
+  message: string = "Password must be at least 8 characters long, contain one letter and one number"
+) => Matches(pattern, { message });
+
 @InputType()
 export class RegisterInput {
   @Field(_type => GraphQLEmailAddress)
@@ -12,9 +17,7 @@ export class RegisterInput {
   email!: string;
 
   @Field()
-  @Matches(/^(?=.*[A-Za-z])(?=.*\d)[\d\w\W]{8,}$/, {
-    message: "Password must be at least 8 characters long, contain one letter and one number"
-  })
+  @IsPassword()
   password!: string;
 
   @Field()
@@ -33,6 +36,22 @@ export class LoginArgs {
 
 @ObjectType()
 export class LoginResult {
+  @Field()
+  token!: string;
+}
+
+@ArgsType()
+export class RequestPasswordResetArgs {
+  @Field(_type => GraphQLEmailAddress)
+  email!: string;
+}
+
+@ArgsType()
+export class ResetPasswordArgs {
+  @Field()
+  @IsPassword()
+  password!: string;
+
   @Field()
   token!: string;
 }
